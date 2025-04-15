@@ -1,0 +1,9 @@
+# contactPoints:
+#   - orgId: 1
+#     name: telegram-alert
+#     receivers:
+#       - uid: telegram-receiver
+#         type: telegram
+#         settings:
+#           bottoken: BOT_TOKEN_HERE:))
+#           chatid: CHAT_ID_HERE

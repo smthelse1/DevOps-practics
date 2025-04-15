@@ -1,0 +1,7 @@
+# policies:
+#   - orgId: 1
+#     receiver: telegram-alert
+#     group_by: ['RabbitMq messages ready']
+#     group_wait: 10s
+#     group_interval: 10s
+#     repeat_interval: 10s
