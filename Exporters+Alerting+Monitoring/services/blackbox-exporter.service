@@ -1,0 +1,19 @@
+[Unit]
+Description=blackbox exporter
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+RestartSec=60s
+Type=simple
+ExecStart=/usr/bin/docker run \
+  --rm \
+  --publish=9115:9115 \
+  --memory=64m \
+  --name=blackbox-exporter \
+  prom/blackbox-exporter:v0.22.0
+ExecStop=/usr/bin/docker stop blackbox-exporter
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,63 @@
+groups:
+ 
+- name: target
+  rules:
+    - alert: target_down
+      expr: up == 0
+      for: 1m
+      labels:
+        service: target
+        severity: critical
+      annotations:
+        summary: 'Target down! Failed to scrape {{ $labels.job }} on {{ $labels.instance }}'
+ 
+- name: probe
+  rules:
+    - alert: probe_down
+      expr: probe_success == 0
+      for: 1m
+      labels:
+        service: probe
+        severity: error
+      annotations:
+        summary: 'Probe {{ $labels.instance }} down'
+ 
+- name: hardware
+  rules:
+    - alert: hardware_cpu
+      expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 75
+      for: 3m
+      labels:
+        service: hardware
+        severity: warning
+      annotations:
+        summary: 'High CPU load on {{ $labels.instance }} - {{ $value | printf "%.2f" }}%'
+ 
+    - alert: hardware_memory
+      expr: 100 - ((node_memory_MemAvailable_bytes * 100) / node_memory_MemTotal_bytes) > 85
+      for: 3m
+      labels:
+        service: hardware
+        severity: warning
+      annotations:
+        summary: 'High memory utilization on {{ $labels.instance }} - {{ $value | printf "%.2f" }}%'
+ 
+    - alert: hardware_disk
+      expr: (node_filesystem_free_bytes / node_filesystem_size_bytes * 100) < 25
+      for: 3m
+      labels:
+        service: hardware
+        severity: error
+      annotations:
+        summary: 'Low free space on {{ $labels.instance }} device {{ $labels.device }} mounted on {{ $labels.mountpoint }} - {{ $value | printf "%.2f" }}%'
+ 
+- name: container
+  rules:
+    - alert: container_down
+      expr: (time() - container_last_seen) > 60
+      for: 1m
+      labels:
+        service: container
+        severity: error
+      annotations:
+        summary: 'Container down! Last seen {{ $labels.name }} on {{ $labels.instance }} - {{ $value | printf "%.2f" }}s ago'

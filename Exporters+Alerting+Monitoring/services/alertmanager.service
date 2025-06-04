@@ -1,0 +1,21 @@
+[Unit]
+Description=alertmanager
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=always
+RestartSec=30s
+Type=simple
+ExecStart=/usr/bin/docker run \
+  --rm \
+  --publish=9093:9093 \
+  --memory=512m \
+  --volume=/etc/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro \
+  --name=alertmanager \
+  prom/alertmanager:v0.23.0 \
+  --config.file=/etc/alertmanager/alertmanager.yml
+ExecStop=/usr/bin/docker stop alertmanager
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,19 @@
+apiVersion: 1
+ 
+datasources:
+  - name: Prometheus
+    type: prometheus
+    version: 1
+    access: proxy
+    orgId: 1
+    basicAuth: false
+    editable: false
+    url: http://host.docker.internal:9090
+  - name: VictoriaMetrics
+    type: prometheus
+    version: 1
+    access: proxy
+    orgId: 1
+    basicAuth: false
+    editable: false
+    url: http://host.docker.internal:8428

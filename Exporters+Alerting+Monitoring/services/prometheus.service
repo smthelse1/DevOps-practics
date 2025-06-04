@@ -1,0 +1,23 @@
+[Unit]
+Description=prometheus
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+RestartSec=30s
+Type=simple
+ExecStart=/usr/bin/docker run --rm \
+  --user=1101 \
+  --publish=9090:9090 \
+  --volume=/etc/prometheus/:/etc/prometheus/ \
+  --volume=/data/prometheus/:/prometheus/ \
+  --name=prometheus \
+  prom/prometheus:v2.30.3 \
+  --storage.tsdb.path=/prometheus \
+  --storage.tsdb.retention=14d \
+  --config.file=/etc/prometheus/prometheus.yml
+ExecStop=/usr/bin/docker stop prometheus
+
+[Install]
+WantedBy=multi-user.target

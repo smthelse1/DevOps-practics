@@ -1,0 +1,28 @@
+[Unit]
+Description=cadvisor
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=always
+Type=simple
+ExecStartPre=-/usr/bin/docker rm node-exporter
+ExecStart=/usr/bin/docker run \
+  --rm \
+  --publish=8080:8080 \
+  --volume=/:rootfs:ro \
+  --volume=/var/run/:/var/run:ro \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --volume=/dev/disk/:/dev/disk:ro \
+  --privileged=true \
+  --name=cadvisor \
+  gcr.io/cadvisor/cadvisor:v0.44.0
+
+ExecStop=/usr/bin/docker stop -t cadvisor
+ExecStopPost=/usr/bin/docker rm cadvisor
+#User=root
+#Group=docker
+
+[Install]
+WantedBy=multi-user.target

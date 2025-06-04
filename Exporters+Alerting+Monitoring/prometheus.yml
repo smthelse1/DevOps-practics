@@ -1,0 +1,72 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 30s
+ 
+# alerting settings
+alerting:
+  alertmanagers:
+  - follow_redirects: true
+    timeout: 10s
+    static_configs:
+    - targets:
+      - localhost:9093
+ 
+# alert rule files
+rule_files:
+- /etc/prometheus/rule_files/*.yml
+ 
+# remote write to victoriametrics
+remote_write:
+- url: http://localhost:8428/api/v1/write
+  remote_timeout: 30s
+ 
+# scrape exporter jobs
+scrape_configs:
+- job_name: 'prometheus'
+  static_configs:
+    - targets:
+      - localhost:9090
+- job_name: 'node'
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+      - localhost:9100
+- job_name: 'cadvisor'
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+      - localhost:8080
+- job_name: 'blackbox'
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+      - localhost:9115
+- job_name: 'blackbox-tcp'
+  metrics_path: /probe
+  params:
+    module: [tcp_connect]
+  static_configs:
+    - targets:
+      - github.com:443
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [__param_target]
+      target_label: instance
+    - target_label: __address__
+      replacement: localhost:9115
+- job_name: 'blackbox-http'
+  metrics_path: /probe
+  params:
+    module: [http_2xx]
+  static_configs:
+    - targets:
+      - https://github.com
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [__param_target]
+      target_label: instance
+    - target_label: __address__
+      replacement: localhost:9115

@@ -1,0 +1,22 @@
+[Unit]
+Description=grafana
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+RestartSec=30s
+Type=simple
+ExecStart=/usr/bin/docker run \
+  --rm \
+  --user=1102 \
+  --publish=3000:3000 \
+  --memory=1024m \
+  --volume=/etc/grafana/provisioning:/etc/grafana/provisioning \
+  --volume=/data/grafana:/var/lib/grafana \
+  --name=grafana \
+  grafana/grafana:9.2.8
+ExecStop=/usr/bin/docker stop grafana
+
+[Install]
+WantedBy=multi-user.target

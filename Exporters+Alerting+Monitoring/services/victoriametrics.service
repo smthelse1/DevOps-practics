@@ -1,0 +1,21 @@
+[Unit]
+Description=victoriametrics
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+RestartSec=30s
+Type=simple
+ExecStart=/usr/bin/docker run \
+  --rm \
+  --publish=8428:8428 \
+  --volume=/data/victoriametrics:/victoria-metrics-data \
+  --name=victoriametrics \
+  victoriametrics/victoria-metrics:v1.55.1 \
+  -dedup.minScrapeInterval=60s \
+  -retentionPeriod=2
+ExecStop=/usr/bin/docker stop victoriametrics
+
+[Install]
+WantedBy=multi-user.target

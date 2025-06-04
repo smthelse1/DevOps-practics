@@ -1,0 +1,25 @@
+[Unit]
+Description=node exporter
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=always
+Type=simple
+ExecStartPre=-/usr/bin/docker rm node-exporter
+ExecStart=/usr/bin/docker run \
+  --rm \
+  --publish=9100:9100 \
+  --memory=64m \
+  --volume="/proc:/host/proc:ro" \
+  --volume="/sys:/host/sys:ro" \
+  --volume="/:/rootfs:ro" \
+  --name=node-exporter \
+  prom/node-exporter:v1.1.2 
+ExecStop=/usr/bin/docker stop -t 10 node-exporter
+ExecStopPost=/usr/bin/docker rm node-exporter
+#User=root
+#Group=docker
+
+[Install]
+WantedBy=multi-user.target
