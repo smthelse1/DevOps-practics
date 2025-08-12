@@ -52,7 +52,7 @@ check_interval = 0
 [[runners]]
   name = "docker-dind-runner"
   url = "http://host.docker.internal:8929"
-  token = "glrtr-peowEHIDhzQDNJygBfm2VW86MQpwOjEKdDozCw.01.120tvuijg"
+  token = ""
   executor = "docker"
   [runners.docker]
     tls_verify = false
@@ -200,7 +200,7 @@ shutdown_timeout = 0
   name = "dind"
   url = "https://git.21-school.ru"
   id = 17852
-  token = "HtHKjisT-7NvsmpCCmyn"
+  token = ""
   token_obtained_at = 2025-08-08T10:29:11Z
   token_expires_at = 0001-01-01T00:00:00Z
   executor = "docker"
@@ -366,4 +366,5 @@ telegram_notify:
         -d "parse_mode=MarkdownV2"
   rules:
     - when: always
+
 ```
