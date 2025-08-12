@@ -10,7 +10,7 @@ shutdown_timeout = 0
   name = "dind"
   url = "https://git.21-school.ru"
   id = 17852
-  token = "HtHKjisT-7NvsmpCCmyn"
+  token = ""
   token_obtained_at = 2025-08-08T10:29:11Z
   token_expires_at = 0001-01-01T00:00:00Z
   executor = "docker"
@@ -30,4 +30,5 @@ shutdown_timeout = 0
     wait_for_services_timeout = 180
     volumes = ["/var/run/docker.sock:/var/run/docker.sock","/cache"]
     shm_size = 0
+
     network_mtu = 0
