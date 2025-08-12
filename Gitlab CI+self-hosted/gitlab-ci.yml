@@ -1,0 +1,86 @@
+stages:
+  - setup
+  - proxy
+  - test
+  - cleanup
+
+variables:
+  DOCKER_HOST: unix:///var/run/docker.sock
+  DOCKER_TLS_CERTDIR: "/certs"
+  NETWORK_NAME: "test-net"
+  WEBPAGE_IMAGE: "nginxdemos/hello"
+  NGINX_IMAGE: "nginx:alpine"
+
+.docker_job: &docker_job
+  image: docker:24.0
+  services:
+    - docker:dind
+  tags:
+    - dind
+
+run-webpage:
+  <<: *docker_job
+  stage: setup
+  script:
+    - docker network create $NETWORK_NAME || true
+    - docker run -d --name webpage --network $NETWORK_NAME $WEBPAGE_IMAGE
+    - |
+      timeout 30 sh -c '
+        until docker inspect -f "{{.State.Running}}" webpage 2>/dev/null | grep -q "true"; do
+          sleep 2
+        done
+      ' || { echo "Container webpage failed to start"; exit 1; }
+
+run-nginx:
+  <<: *docker_job
+  stage: proxy
+  needs: [run-webpage]
+  script:
+    - docker rm -f nginx 2>/dev/null || true
+    - docker run -d --name nginx --network $NETWORK_NAME -p 8080:80 $NGINX_IMAGE 
+    - |
+      cat <<EOF | docker exec -i nginx sh -c 'cat > /etc/nginx/conf.d/default.conf'
+      server {
+          listen 80;
+          location / {
+              proxy_pass http://webpage;
+          }
+      }
+      EOF
+    - docker exec nginx nginx -s reload
+    - |
+      timeout 30 sh -c '
+        until docker inspect -f "{{.State.Running}}" webpage 2>/dev/null | grep -q "true"; do
+          sleep 2
+        done
+      ' || { echo "Container webpage failed to start"; exit 1; }
+
+test-nginx-proxy:
+  <<: *docker_job
+  stage: test
+  needs: [run-nginx]
+  script:
+    - apk add curl
+    - curl -v http://webpage > curl_output.txt 2>&1
+  artifacts:
+    paths:
+      - curl_output.txt
+    when: on_success
+    access: all
+    expire_in: 1 hour
+
+
+test-hello-world:
+  <<: *docker_job
+  stage: test
+  script:
+    - docker info
+    - docker run --rm hello-world
+
+cleanup:
+  <<: *docker_job
+  stage: cleanup
+  when: always
+  script:
+    - docker rm -f webpage nginx || true
+    - docker network rm $NETWORK_NAME || true
