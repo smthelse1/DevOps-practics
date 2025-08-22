@@ -1,0 +1,16 @@
+[Unit]
+Description=Simple Python HTTP Server
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ app_user }}
+Group={{ app_group }}
+WorkingDirectory={{ app_directory }}
+ExecStart={{ python_executable }} {{ app_directory }}/app.py
+Restart=on-failure
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

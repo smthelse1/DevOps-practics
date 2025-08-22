@@ -1,0 +1,23 @@
+---
+- name: Gather package facts
+  package_facts:
+    manager: auto
+
+- name: Install required packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - git
+    - nginx
+    - python3
+  when: item not in ansible_facts.packages
+
+- name: Ensure application user exists
+  user:
+    name: "{{ app_user }}"
+    groups: "{{ app_group }}"
+    append: yes
+    create_home: yes
+    shell: /bin/bash
+# tasks file for common

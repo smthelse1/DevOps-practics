@@ -1,0 +1,6 @@
+---
+app_user: appuser
+app_group: www-data
+root_user: root
+config_mode: 0644
+# defaults file for common

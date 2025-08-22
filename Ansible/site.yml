@@ -1,0 +1,11 @@
+---
+- name: Deploy Python Application
+  hosts: local
+  become: yes
+  roles:
+    - role: common
+      tags: common
+    - role: nginx
+      tags: nginx
+    - role: python-app
+      tags: python-app

@@ -1,0 +1,28 @@
+---
+- name: Deploy Nginx configuration
+  template:
+    src: nginx-site.conf.j2
+    dest: /etc/nginx/sites-enabled/{{ nginx_site_name }}.conf
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: "{{ config_mode }}"
+  notify: restart nginx
+
+- name: Validate Nginx configuration
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+  failed_when: nginx_test.rc != 0
+
+- name: Ensure Nginx is enabled and started
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Check Nginx status
+  systemd:
+    name: nginx
+  register: nginx_status
+  changed_when: false
+# tasks file for nginx
