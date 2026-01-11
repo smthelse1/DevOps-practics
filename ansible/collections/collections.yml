@@ -1,5 +1,0 @@
-collections:
-  - name: community.docker
-    version: "3.13.2"
-  - name: ansible.posix
-    version: "1.5.4"

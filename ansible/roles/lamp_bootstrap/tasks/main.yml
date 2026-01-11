@@ -1,6 +1,0 @@
----
-#- name: Load OS vars
-#  include_vars: "{{ ansible_distribution | lower}}.yml"
-
-- name: Ping target host
-  ping:
