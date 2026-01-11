@@ -1,0 +1,5 @@
+- name: Test lamp_bootstrap role
+  hosts: all
+  become: true
+  roles:
+    - lamp_bootstrap
